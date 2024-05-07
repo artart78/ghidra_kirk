@@ -7,6 +7,6 @@
   </default_memory_blocks>
 
   <default_symbols>
-    <symbol name="reset" address="rom:0x00000004" entry="true" type="code"/>
+    <symbol name="reset" address="rom:0x00000001" entry="true" type="code"/>
   </default_symbols>
 </processor_spec>

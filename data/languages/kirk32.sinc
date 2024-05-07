@@ -54,11 +54,20 @@ imm: immed is t32_imm [immed = 0 + t32_imm;] {
 	export tmp;
 }
 
+define pcodeop __builtin_nop;
+:nop is t32_opcode=0x00 {
+    __builtin_nop();
+}
+
 :mov addr1, addr2 is t32_opcode=0x0B & addr1 & addr2 {
 	addr2 = addr1;
 }
 
-:movp addr1, addr2 is t32_opcode=0x0D & addr1 & addr2 {
+:movy addr1, addr2 is t32_opcode=0x0C & addr1 & addr2 {
+	*[ram]:4 addr2 = addr1;
+}
+
+:movx addr1, addr2 is t32_opcode=0x0D & addr1 & addr2 {
 	addr2 = *[ram]:4 addr1;
 }
 
@@ -116,6 +125,25 @@ imm: immed is t32_imm [immed = 0 + t32_imm;] {
 	affectflags();
 }
 
+:xorpp addr1, addr2 is t32_opcode=0x4E & addr1 & addr2 {
+	local tmp:$(REGSIZE) = *[ram]:4 addr1;
+	local res:$(REGSIZE) = tmp ^ *[ram]:4 addr2;
+	*[ram]:4 addr2 = res;
+
+	logicflags();
+	affectflags();
+}
+
+define pcodeop __unk_op62;
+:op62 branchAddress is t32_opcode=0x62 & branchAddress {
+    __unk_op62(branchAddress);
+}
+
+define pcodeop __unk_op68;
+:op68 branchAddress is t32_opcode=0x68 & branchAddress {
+    __unk_op68(branchAddress);
+}
+
 :mov128 addr1_128, addr2_128 is t32_opcode=0x53 & addr1_128 & addr2_128 {
 	addr2_128 = addr1_128;
 }
@@ -165,6 +193,11 @@ define pcodeop __builtin_byteswap;
 	affectflags();
 }
 
+define pcodeop __unk_check7;
+:check7 addr1, imm2 is t32_opcode = 0xC7 & addr1 & imm2 {
+    __unk_check7(addr1, imm2);
+}
+
 :bset addr1, imm2 is t32_opcode=0xC8 & addr1 & imm2 {
 	local tmp:$(REGSIZE) = addr1;
 	tmp = tmp | (1 << imm2);
@@ -209,3 +242,4 @@ define pcodeop __builtin_intr;
 :dma imm is t32_opcode=0xF8 & imm {
 	__builtin_intr(imm);
 }
+
